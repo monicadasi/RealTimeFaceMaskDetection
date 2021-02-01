@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 The TensorFlow Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.arts.realtime_facemask_detection;
 
 import android.Manifest;
@@ -122,14 +137,6 @@ public abstract class CameraActivity extends AppCompatActivity
         return rgbBytes;
     }
 
-    protected int getLuminanceStride() {
-        return yRowStride;
-    }
-
-    protected byte[] getLuminance() {
-        return yuvBytes[0];
-    }
-
     /**
      * Callback for android.hardware.Camera API
      */
@@ -139,7 +146,6 @@ public abstract class CameraActivity extends AppCompatActivity
             Log.i(TAG, "onPreviewFrame: Dropping frame");
             return;
         }
-
         try {
             // Initialize the storage bitmaps once when the resolution is known.
             if (rgbBytes == null) {
@@ -394,17 +400,10 @@ public abstract class CameraActivity extends AppCompatActivity
 
             camera2Fragment.setCamera(cameraId);
             fragment = camera2Fragment;
+            getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
         } else {
-            // legacy camera support not available
-            int facing = (useFacing == CameraCharacteristics.LENS_FACING_BACK) ?
-                    Camera.CameraInfo.CAMERA_FACING_BACK :
-                    Camera.CameraInfo.CAMERA_FACING_FRONT;
-            com.arts.realtime_facemask_detection.LegacyCameraConnectionFragment frag = new com.arts.realtime_facemask_detection.LegacyCameraConnectionFragment(this,
-                    getLayoutId(),
-                    getDesiredPreviewFrameSize(), facing);
-            fragment = frag;
+            Log.e(TAG, "setFragment: Legacy camera not supported!! Please use the latest android phone");
         }
-        getFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
     }
 
     protected void fillBytes(final Plane[] planes, final byte[][] yuvBytes) {
@@ -452,10 +451,7 @@ public abstract class CameraActivity extends AppCompatActivity
     }
 
     protected abstract void processImage();
-
     protected abstract void onPreviewSizeChosen(final Size size, final int rotation);
-
     protected abstract int getLayoutId();
-
     protected abstract Size getDesiredPreviewFrameSize();
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2019 The TensorFlow Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.arts.realtime_facemask_detection.tflite;
 
 import android.content.res.AssetFileDescriptor;
@@ -138,7 +154,6 @@ public class TfLiteObjectDetectionModel implements Classifier {
     public List<Recognition> recognizeImage(final Bitmap bitmap) {
         // Log this method so that it can be analyzed with systrace.
         Trace.beginSection("recognizeImage");
-
         Trace.beginSection("preprocessBitmap");
         // Preprocess the image data from 0-255 int to normalized float based
         // on the provided parameters.
@@ -196,12 +211,13 @@ public class TfLiteObjectDetectionModel implements Classifier {
             id = "1";
         }
         Log.i("TFLiteObjectDetection", "recognizeImage: prediction: " + mask + ", " + no_mask);
-        // Show the best detections.
-        // after scaling them back to the input size.
-        // You need to use the number of detections from the output and not the NUM_DETECTONS variable declared on top
-        // because on some models, they don't always output the same total number of detections
-        // For example, your model's NUM_DETECTIONS = 20, but sometimes it only outputs 16 predictions
-        // If you don't use the output's numDetections, you'll get nonsensical data
+        /* Show the best detections.
+         * after scaling them back to the input size.
+         * You need to use the number of detections from the output and not the NUM_DETECTONS variable declared on top
+         * because on some models, they don't always output the same total number of detections
+         * For example, your model's NUM_DETECTIONS = 20, but sometimes it only outputs 16 predictions
+         * If you don't use the output's numDetections, you'll get nonsensical data
+         */
         int numDetectionsOutput = Math.min(NUM_DETECTIONS, (int) numDetections[0]); // cast from float to integer, use min for safety
 
         final ArrayList<Recognition> recognitions = new ArrayList<>(numDetectionsOutput);
@@ -213,27 +229,5 @@ public class TfLiteObjectDetectionModel implements Classifier {
                         new RectF()));
         Trace.endSection(); // "recognizeImage"
         return recognitions;
-    }
-
-    @Override
-    public void enableStatLogging(final boolean logStats) {
-    }
-
-    @Override
-    public String getStatString() {
-        return "";
-    }
-
-    @Override
-    public void close() {
-    }
-
-    public void setNumThreads(int num_threads) {
-        if (tfLite != null) tfLite.setNumThreads(num_threads);
-    }
-
-    @Override
-    public void setUseNNAPI(boolean isChecked) {
-        if (tfLite != null) tfLite.setUseNNAPI(isChecked);
     }
 }
