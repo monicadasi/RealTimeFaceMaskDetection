@@ -1,2 +1,2 @@
 # Real-Time Systems
-About This repository is created for Advanced Real-Time Systems
+About This repository is created for Advanced Real-Time Systems For Face Mask Detection.
